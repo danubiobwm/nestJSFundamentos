@@ -51,6 +51,10 @@ export class UserService {
   }
 
   async delete(id: number){
+    if(!(await this.show(id))){
+      throw new Error('User not found')
+    }
+
     return this.prisma.user.delete({
       where: {id}
     })
