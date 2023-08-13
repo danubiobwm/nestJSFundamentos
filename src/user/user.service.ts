@@ -7,56 +7,61 @@ import { UpdatePatchUserDTO } from "./dto/update-patch-user-dto";
 @Injectable()
 export class UserService {
 
-  constructor(private readonly prisma: PrismaService){}
+  constructor(private readonly prisma: PrismaService) { }
 
-  async create({name, email, password}: CreateUserDTO){
+  async create({ name, email, password }: CreateUserDTO) {
 
     return await this.prisma.user.create({
-      data:{
+      data: {
         name, email, password
       }
     })
 
   }
 
-  async list(){
+  async list() {
     return this.prisma.user.findMany();
   }
 
-  async show(id: number){
+  async show(id: number) {
     return this.prisma.user.findUnique({
-      where: {id}
+      where: { id }
     })
   }
 
-  async update(id: number, {name, email, password, birthAt}: UpdatePutUserDTO){
+  async update(id: number, { name, email, password, birthAt }: UpdatePutUserDTO) {
 
     return this.prisma.user.update({
-      where: {id},
-      data: {name, email, password, birthAt: birthAt ? new Date(birthAt) : null},
+      where: { id },
+      data: { name, email, password, birthAt: birthAt ? new Date(birthAt) : null },
     })
   }
 
-  async updatePartial(id: number, {name, email, password, birthAt}: UpdatePatchUserDTO){
+  async updatePartial(id: number, { name, email, password, birthAt }: UpdatePatchUserDTO) {
     const data: any = {}
-    if(birthAt){
+    if (birthAt) {
       data.birthAt = new Date(birthAt)
     }
 
 
     return this.prisma.user.update({
-      where: {id},
-      data: {name, email, password, birthAt},
+      where: { id },
+      data: { name, email, password, birthAt },
     })
   }
 
-  async delete(id: number){
-    if(!(await this.show(id))){
-      throw new NotFoundException(`User ${id} not found`)
-    }
+  async delete(id: number) {
+
+    await this.exists(id)
 
     return this.prisma.user.delete({
-      where: {id}
+      where: { id }
     })
+  }
+
+  async exists(id: number) {
+    if (!(await this.show(id))) {
+      throw new NotFoundException(`User ${id} not found`)
+    }
   }
 }
