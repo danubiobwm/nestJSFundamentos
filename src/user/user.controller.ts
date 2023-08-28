@@ -4,6 +4,7 @@ import { UpdatePutUserDTO } from "./dto/update-put-user-dto";
 import { UpdatePatchUserDTO } from "./dto/update-patch-user-dto";
 import { UserService } from "./user.service";
 import { LogInterceptor } from "src/interceptors/log.interceptor";
+import { paramsId } from "src/decorators/param-id.decorator";
 
 @Controller('users')
 export class UserController {
@@ -22,7 +23,7 @@ export class UserController {
   }
 
   @Get(':id')
-  async show(@Param('id', ParseIntPipe) id:number){
+  async show(@paramsId('id', ParseIntPipe) id:number){
     return this.userService.show(id)
   }
 
