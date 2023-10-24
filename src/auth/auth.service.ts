@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
-import {  User } from '@prisma/client';
+import { User } from '@prisma/client';
 import { AuthRegisterDto } from './dto/auth-register.dto';
 import { UserService } from '../user/user.service'
 
@@ -11,15 +11,15 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly prisma: PrismaService,
     private readonly userService: UserService
-    ) { }
+  ) { }
 
   async createToken(user: User) {
     return {
-     accessToken: this.jwtService.sign({
+      accessToken: this.jwtService.sign({
         sub: user.id,
         name: user.name,
         email: user.email,
-      },{
+      }, {
         expiresIn: '7 days',
         issuer: 'login',
         audience: 'users',
@@ -27,8 +27,27 @@ export class AuthService {
     }
   }
 
-  async checkToken(token: string) {
-    // return this.jwtService.verify();
+   checkToken(token: string) {
+    try {
+      const data = this.jwtService.verify(token, {
+        audience: 'users',
+        issuer: 'login'
+      }
+      );
+      return data;
+    } catch (e) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+  }
+
+
+  async isValidToke(token: string) {
+    try {
+      this.checkToken(token)
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
 
@@ -71,14 +90,14 @@ export class AuthService {
       }
     })
     return this.createToken(user);
-}
+  }
 
 
-    async register(data: AuthRegisterDto){
-      const user = await this.userService.create(data)
+  async register(data: AuthRegisterDto) {
+    const user = await this.userService.create(data)
 
-      return this.createToken(user);
-    }
+    return this.createToken(user);
+  }
 
 
 }
