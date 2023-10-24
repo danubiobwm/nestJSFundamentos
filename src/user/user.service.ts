@@ -24,9 +24,15 @@ export class UserService {
   }
 
   async show(id: number) {
+
+    await this.exists(id);
+
     return this.prisma.user.findUnique({
-      where: { id }
+      where: {
+        id,
+      }
     })
+
   }
 
   async update(id: number, { name, email, password, birthAt }: UpdatePutUserDTO) {
@@ -59,12 +65,13 @@ export class UserService {
       where: { id }
     })
   }
-
   async exists(id: number) {
     if (!(await this.prisma.user.count({
-      where: { id }
+      where: {
+        id
+      }
     }))) {
-      throw new NotFoundException(`User ${id} not found`)
+      throw new NotFoundException(`O usuário ${id} não existe.`);
     }
   }
 }
