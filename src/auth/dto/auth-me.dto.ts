@@ -1,6 +1,8 @@
-import {IsJWT} from "class-validator";
+import { IsJWT } from "class-validator";
 
-export class AuthMeDto {
+export class AuthMeDTO {
+
     @IsJWT()
     token: string;
+
 }
